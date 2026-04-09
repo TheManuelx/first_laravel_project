@@ -54,6 +54,10 @@ class UserController extends Controller
             'password' => $request->password ? bcrypt($request->password) : $user->password,
         ]);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'User update successfully']);
+        }
+
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
 
@@ -76,8 +80,11 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User updated or created successfully.');
     }
 
-    public function show(User $user)
+    public function show(Request $request, User $user)
     {
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json($user);
+        }
         return view('users.show', compact('user'));
     }
 
@@ -113,10 +120,21 @@ class UserController extends Controller
         return redirect()->route('users.trashed')->with('error', 'User cannot be restored. Restoration period has expired.');
     }
 
-    public function forceDelete($id)
+    public function softDelete($id)
     {
-        $user = User::onlyTrashed()->findOrFail($id);
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return  response()->json(['success' => true, 'message' => 'User soft delete successfully']);
+    }
+
+    public function forceDelete(Request $request, $id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
         $user->forceDelete();
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'User permanently Deleted']);
+        }
         return redirect()->route('users.trashed')->with('success', 'User permanently deleted.');
     }
 

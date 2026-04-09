@@ -38,3 +38,7 @@ Route::get('users-list', function () {
     return view('users.data');
 })->name('users.list');
 Route::get('users-data', [UserController::class, 'getUsersData'])->name('users.data');
+
+//for ajax
+Route::delete('users/{id}/soft-delete', [UserController::class, 'softDelete']);
+Route::delete('users/{id}', [UserController::class, 'forceDelete']);

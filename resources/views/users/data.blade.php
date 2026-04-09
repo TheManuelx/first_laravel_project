@@ -1,14 +1,16 @@
 <!doctype html>
 <html lang="en">
-<head name="csrf-token" content="{{ csrf_token() }}">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Users List</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         $.ajaxSetup({
@@ -35,33 +37,36 @@
             });
 
             //Soft Delete User
-            $('users-table').on('click', '.soft-delete-btn', function() {
+            $('#users-table').on('click', '.soft-delete-btn', function() {
                 if(confirm('Do you want to achive this user?')) {
                     let userId = $(this).data('id');
                     $.ajax({
-                        url: '/users/${userId}/soft-delete',
-                        method: 'Delete',
-                        success: function() {
+                        url: `/users/${userId}/soft-delete`,
+                        method: 'DELETE',
+                        success: function(response) {
                             $('#users-table').DataTable().ajax.reload();
+                            alert('Achived Successfully');
                         }
                     });
                 }
             });
 
             //Permanently Delete User
-            $('#user-table').on('click', '.delete-btn', function() {
+            $('#users-table').on('click', '.delete-btn', function() {
                 if(confirm('Are you sure?\nUser data will be permanently lost.')) {
                     let userId = $(this).data('id');
                     $.ajax({
-                        url: '/users/${userId}/',
+                        url: `/users/${userId}`,
                         method: 'DELETE',
-                        success: function() {
-                            $('#user-table').DataTable().ajax.reload();
+                        success: function(response) {
+                            $('#users-table').DataTable().ajax.reload();
+                            alert('Deleted Permanently');
                         }
                     });
                 }
             });
 
+            //Edit User
             $('#users-table').on('click', '.edit-btn', function() {
                 var userId = $(this).data('id');
                 // Fetch user data and populate the edit form
@@ -70,21 +75,30 @@
                     $('#edit-name').val(user.name);
                     $('#edit-email').val(user.email);
                     $('#editModal').modal('show');
+                }).fail(function() {
+                    alert('Could not fetch user data');
                 });
             });
+
+            //Save Change Update
             $('#save-changes').click(function() {
                 var userId = $('#edit-user-id').val();
                 var updatedData = {
                     name: $('#edit-name').val(),
-                    email: $('#edit-email').val()
+                    email: $('#edit-email').val(),
+                    _method: 'PUT'
                 };
                 $.ajax({
                     url: `/users/${userId}`,
-                    method: 'PUT',
+                    method: 'POST',
                     data: updatedData,
                     success: function(response) {
                         $('#editModal').modal('hide');
                         $('#users-table').DataTable().ajax.reload();
+                        alert('Updated Successfully');
+                    },
+                    error: function() {
+                        alert('Update Failed');
                     }
                 });
             });
