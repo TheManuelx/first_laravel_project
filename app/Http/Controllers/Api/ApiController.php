@@ -53,11 +53,14 @@ class ApiController extends Controller
                 'message' => "Don't have user information or Email/Password invalid"
             ], 401);
         }
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $user->tokens()->delete();
+        $accessToken = $user->createToken('access_token', ['access-api'])->plainTextToken;
+        $refreshToken = $user->createToken('refresh_token', ['refresh-api'])->plainTextToken;
         return response()->json([
             'status' => 'success',
             'message' => 'Login Successfully',
-            'access-token' => $token,
+            'access_token' => $accessToken,
+            'refresh_token'=> $refreshToken,
         ], 200);
     }
 
@@ -65,13 +68,27 @@ class ApiController extends Controller
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-        
+
         return response()->json([
             'status' => 'success',
             'message' => 'Logout Successfully',
         ], 200);
         
     }
+
+    //Refresh Token
+    public function refresh(Request $request)
+    {
+        $user = $request->user();
+        $user->currentAccessToken()->delete();
+        $newAccessToken = $user->createToken('access_token')->plainTextToken;
+        $newRefreshToken = $user->createToken('refresh_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $newAccessToken,
+            'refresh_token' => $newRefreshToken,
+        ]);
+    } 
 
     public function index()
     {

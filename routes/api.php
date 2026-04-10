@@ -27,12 +27,18 @@ Route::get('users', [ApiController::class, 'index']);
 //Login
 Route::post('login', [ApiController::class, 'login']);
 
-//Logout
+
 Route::middleware('auth:sanctum')->group(function() {
+    //Logout
     Route::post('logout', [ApiController::class, 'logout']);
     Route::get('users', [ApiController::class, 'index']);
+
+    //Refresh Token
+    Route::post('refresh', [ApiController::class, 'refresh']);
 
     Route::get('/users', function (Request $request) {
         return $request->user();
     });
 });
+
+
