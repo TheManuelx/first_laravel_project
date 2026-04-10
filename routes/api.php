@@ -22,11 +22,9 @@ Route::get('/hello', function() {
 
 //Register
 Route::post('register', [ApiController::class, 'register']);
-Route::get('users', [ApiController::class, 'index']);
 
 //Login
 Route::post('login', [ApiController::class, 'login']);
-
 
 Route::middleware(['auth:sanctum', 'abilities:access-api'])->group(function() {
     //Logout
@@ -39,11 +37,13 @@ Route::middleware(['auth:sanctum', 'abilities:access-api'])->group(function() {
     Route::get('/users', function (Request $request) {
         return $request->user();
     });
+
 });
+
+Route::middleware('auth:sanctum')->get('/me', [ApiController::class, 'me']);
 
 //Refresh
 Route::middleware(['auth:sanctum', 'abilities:refresh-api'])->group(function () {
     Route::post('refresh', [ApiController::class, 'refresh']);
 });
-
 

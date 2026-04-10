@@ -118,7 +118,16 @@ class ApiController extends Controller
             'access_token' => $newAccessToken,
             'refresh_token' => $newRefreshToken,
         ]);
-    } 
+    }
+
+    public function me(Request $request)
+    {
+        $user = $request->user();
+        return response()->json([
+            'status' => 'success',
+            'data' => $user,
+        ], 200);
+    }
 
     public function index()
     {
