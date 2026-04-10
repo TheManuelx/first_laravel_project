@@ -28,7 +28,7 @@ Route::get('users', [ApiController::class, 'index']);
 Route::post('login', [ApiController::class, 'login']);
 
 
-Route::middleware('auth:sanctum')->group(function() {
+Route::middleware(['auth:sanctum', 'abilities:access-api'])->group(function() {
     //Logout
     Route::post('logout', [ApiController::class, 'logout']);
     Route::get('users', [ApiController::class, 'index']);
@@ -39,6 +39,11 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('/users', function (Request $request) {
         return $request->user();
     });
+});
+
+//Refresh
+Route::middleware(['auth:sanctum', 'abilities:refresh-api'])->group(function () {
+    Route::post('refresh', [ApiController::class, 'refresh']);
 });
 
 
