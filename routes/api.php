@@ -24,6 +24,15 @@ Route::get('/hello', function() {
 Route::post('register', [ApiController::class, 'register']);
 Route::get('users', [ApiController::class, 'index']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+//Login
+Route::post('login', [ApiController::class, 'login']);
+
+//Logout
+Route::middleware('auth:sanctum')->group(function() {
+    Route::post('logout', [ApiController::class, 'logout']);
+    Route::get('users', [ApiController::class, 'index']);
+
+    Route::get('/users', function (Request $request) {
+        return $request->user();
+    });
 });

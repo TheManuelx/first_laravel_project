@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ApiController extends Controller
 {
+    //Register
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -36,6 +37,40 @@ class ApiController extends Controller
             'message' => 'User Registed Successfully',
             'data' => $user
         ], 201);
+    }
+
+    //Login
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+        $user = User::where('email', $request->email)->first();
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Don't have user information or Email/Password invalid"
+            ], 401);
+        }
+        $token = $user->createToken('auth_token')->plainTextToken;
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Login Successfully',
+            'access-token' => $token,
+        ], 200);
+    }
+
+    //Logout
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Logout Successfully',
+        ], 200);
+        
     }
 
     public function index()
